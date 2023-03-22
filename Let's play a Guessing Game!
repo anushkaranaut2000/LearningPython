@@ -1,0 +1,19 @@
+import random
+
+number = random.randint(1, 20)
+attempts = 0
+
+while attempts < 5:
+    guess = int(input("Guess a number between 1 and 20: "))
+    attempts += 1
+
+    if guess < number:
+        print("Too low, try again.")
+    elif guess > number:
+        print("Too high, try again.")
+    else:
+        print(f"Congratulations! You guessed the number in {attempts} attempts.")
+        break
+
+if attempts == 5:
+    print(f"Sorry, you didn't guess the number. The number was {number}.")
