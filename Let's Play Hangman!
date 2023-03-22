@@ -1,0 +1,58 @@
+import random
+
+# list of words to choose from
+words = ["python", "program", "code", "hangman", "computer", "keyboard", "mouse", "printer"]
+
+# pick a random word from the list
+word = random.choice(words)
+
+# create an empty list to store the guessed letters
+guessed_letters = []
+
+# set the number of allowed guesses
+max_guesses = 10
+
+# function to display the current state of the game
+def display_word(word, guessed_letters):
+    for letter in word:
+        if letter in guessed_letters:
+            print(letter, end=" ")
+        else:
+            print("_", end=" ")
+    print()
+
+# main game loop
+while True:
+    # display the current state of the game
+    display_word(word, guessed_letters)
+
+    # check if the player has won
+    if set(word) == set(guessed_letters):
+        print("Congratulations, you have won!")
+        break
+
+    # check if the player has run out of guesses
+    if max_guesses == 0:
+        print("Sorry, you have run out of guesses. The word was", word)
+        break
+
+    # get a guess from the player
+    guess = input("Guess a letter: ")
+
+    # check if the guess is valid
+    if len(guess) != 1:
+        print("Please enter a single letter.")
+        continue
+    if guess in guessed_letters:
+        print("You have already guessed that letter.")
+        continue
+
+    # add the guess to the list of guessed letters
+    guessed_letters.append(guess)
+
+    # check if the guess is correct
+    if guess in word:
+        print("Correct!")
+    else:
+        print("Incorrect.")
+        max_guesses -= 1
