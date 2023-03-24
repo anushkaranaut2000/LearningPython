@@ -1,0 +1,81 @@
+import pygame
+import random
+
+# Define some colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# Set the dimensions of the screen
+WIDTH = 800
+HEIGHT = 600
+
+# Initialize Pygame
+pygame.init()
+
+# Create the screen
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Pixel Painter")
+
+# Set up the game clock
+clock = pygame.time.Clock()
+
+# Set up the canvas
+canvas_width = 600
+canvas_height = 400
+canvas_pos = [100, 100]
+canvas = pygame.Surface((canvas_width, canvas_height))
+
+# Set up the color palette
+colors = [RED, GREEN, BLUE]
+color_size = 50
+color_pos = [100, 550]
+
+# Set up the cursor
+cursor_pos = [canvas_pos[0], canvas_pos[1]]
+cursor_color = WHITE
+
+# Set up the obstacles
+num_obstacles = 10
+obstacle_size = 20
+obstacle_pos = []
+for i in range(num_obstacles):
+    obstacle_pos.append([random.randint(canvas_pos[0], canvas_pos[0]+canvas_width-obstacle_size), random.randint(canvas_pos[1], canvas_pos[1]+canvas_height-obstacle_size)])
+
+# Set up the game loop
+game_over = False
+time_left = 60
+
+while not game_over:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                cursor_pos[0] -= 1
+            elif event.key == pygame.K_RIGHT:
+                cursor_pos[0] += 1
+            elif event.key == pygame.K_UP:
+                cursor_pos[1] -= 1
+            elif event.key == pygame.K_DOWN:
+                cursor_pos[1] += 1
+            elif event.key == pygame.K_1:
+                cursor_color = RED
+            elif event.key == pygame.K_2:
+                cursor_color = GREEN
+            elif event.key == pygame.K_3:
+                cursor_color = BLUE
+
+    # Update the canvas
+    canvas.fill(BLACK)
+    for i in range(num_obstacles):
+        pygame.draw.rect(canvas, WHITE, (obstacle_pos[i][0], obstacle_pos[i][1], obstacle_size, obstacle_size))
+    pygame.draw.rect(canvas, cursor_color, (cursor_pos[0], cursor_pos[1], 10, 10))
+
+    # Check for collisions with obstacles
+    for i in range(num_obstacles):
+        if cursor_pos[0]+10 > obstacle_pos[i][0]
