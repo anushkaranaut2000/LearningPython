@@ -1,0 +1,8 @@
+# Get the length of one side of the cube from the user
+side_length = float(input("Enter the length of one side of the cube: "))
+
+# Calculate the volume of the cube using the formula V = s^3, where s is the length of one side
+cube_volume = side_length ** 3
+
+# Print the result
+print(f"The volume of the cube is {cube_volume}.")
