@@ -1,0 +1,80 @@
+import random
+import pygame
+pygame.init()
+
+# Set up the screen
+screen_width = 640
+screen_height = 480
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Memory Match")
+
+# Load the images
+card_images = []
+for i in range(1, 9):
+    card_images.append(pygame.image.load(f"card{i}.png"))
+
+# Set up the game
+cards = []
+for i in range(8):
+    cards.append(card_images[i])
+    cards.append(card_images[i])
+
+random.shuffle(cards)
+card_positions = []
+for row in range(4):
+    for col in range(4):
+        x = col * 100 + 50
+        y = row * 100 + 50
+        card_positions.append((x, y))
+
+# Set up the game loop
+game_over = False
+card_flipped = False
+flipped_card_indexes = []
+matched_cards = []
+score = 0
+
+while not game_over:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if not card_flipped:
+                for i, position in enumerate(card_positions):
+                    if pygame.mouse.get_pos()[0] > position[0] and pygame.mouse.get_pos()[0] < position[0] + 100 and pygame.mouse.get_pos()[1] > position[1] and pygame.mouse.get_pos()[1] < position[1] + 100:
+                        flipped_card_indexes.append(i)
+                        card_flipped = True
+            else:
+                for i, position in enumerate(card_positions):
+                    if pygame.mouse.get_pos()[0] > position[0] and pygame.mouse.get_pos()[0] < position[0] + 100 and pygame.mouse.get_pos()[1] > position[1] and pygame.mouse.get_pos()[1] < position[1] + 100 and i not in flipped_card_indexes:
+                        if cards[i] == cards[flipped_card_indexes[0]]:
+                            matched_cards.append(flipped_card_indexes[0])
+                            matched_cards.append(i)
+                            flipped_card_indexes = []
+                            card_flipped = False
+                            score += 1
+                        else:
+                            flipped_card_indexes.append(i)
+                            card_flipped = False
+                            score -= 1
+
+    # Draw the cards
+    screen.fill((255, 255, 255))
+    for i, position in enumerate(card_positions):
+        if i in matched_cards:
+            continue
+        if i in flipped_card_indexes:
+            screen.blit(cards[i], position)
+        else:
+            screen.blit(card_images[0], position)
+    pygame.display.update()
+
+    # Check for end of game
+    if len(matched_cards) == 16:
+        game_over = True
+
+# Display the final score
+font = pygame.font.Font(None, 36)
+text = font.render(f"Final Score: {score}", True, (0, 0, 0))
+screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() //
