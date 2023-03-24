@@ -1,0 +1,66 @@
+import sqlite3
+import smtplib
+import time
+from email.mime.text import MIMEText
+
+# Connect to the database
+conn = sqlite3.connect('timecapsule.db')
+c = conn.cursor()
+
+# Create the messages table if it doesn't exist
+c.execute('''CREATE TABLE IF NOT EXISTS messages
+             (id INTEGER PRIMARY KEY AUTOINCREMENT,
+              message TEXT NOT NULL,
+              recipient TEXT NOT NULL,
+              delivery_time INTEGER NOT NULL,
+              sent INTEGER NOT NULL)''')
+
+# Function to add a message to the database
+def add_message(message, recipient, delivery_time):
+    c.execute('''INSERT INTO messages (message, recipient, delivery_time, sent)
+                 VALUES (?, ?, ?, 0)''', (message, recipient, delivery_time))
+    conn.commit()
+
+# Function to get a list of messages to be sent
+def get_messages_to_send():
+    current_time = int(time.time())
+    c.execute('''SELECT * FROM messages WHERE delivery_time <= ? AND sent = 0''', (current_time,))
+    messages = c.fetchall()
+    return messages
+
+# Function to send a message
+def send_message(message, recipient):
+    # Replace these with your own email credentials
+    email = 'your_email@example.com'
+    password = 'your_password'
+
+    # Create a MIME message
+    msg = MIMEText(message)
+    msg['Subject'] = 'Message from the past'
+    msg['From'] = email
+    msg['To'] = recipient
+
+    # Send the message via SMTP
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()
+        server.login(email, password)
+        server.send_message(msg)
+
+# Function to mark a message as sent
+def mark_message_sent(message_id):
+    c.execute('''UPDATE messages SET sent = 1 WHERE id = ?''', (message_id,))
+    conn.commit()
+
+# Main program loop
+while True:
+    # Get a list of messages to send
+    messages_to_send = get_messages_to_send()
+
+    # Send each message and mark it as sent
+    for message in messages_to_send:
+        send_message(message[1], message[2])
+        mark_message_sent(message[0])
+        print(f"Sent message to {message[2]}: {message[1]}")
+
+    # Wait for 1 minute before checking again
+    time.sleep(60)
